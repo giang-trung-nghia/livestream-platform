@@ -5,7 +5,6 @@ import { CreateLivestreamDto } from './dto/create-livestream.dto';
 import { UpdateLivestreamDto } from './dto/update-livestream.dto';
 import { LivestreamService } from './livestream.service';
 import { PagingResponse } from 'src/common/base/paging-response.entity';
-import { ObjectId } from 'mongodb';
 import { Public } from 'src/common/public_key';
 
 @Controller('live')
@@ -31,14 +30,12 @@ export class LivestreamController extends BaseController<
   async create(
     @Body() createDto: CreateLivestreamDto,
   ): Promise<LivestreamEntity> {
-    console.log(createDto);
-
     const result = await this._livestreamService.create(createDto);
     return result;
   }
 
   @Put('/end/:id')
-  async endLivestream(@Param('id') id: ObjectId): Promise<LivestreamEntity> {
+  async endLivestream(@Param('id') id: string): Promise<LivestreamEntity> {
     return this._livestreamService.endLivestream(id);
   }
 
@@ -59,22 +56,28 @@ export class LivestreamController extends BaseController<
   }
 
   @Public()
+  @Get('/username/:username')
+  async getStreamingByUsername(
+    @Param('username') username: string,
+  ): Promise<LivestreamEntity> {
+    const result =
+      await this._livestreamService.findLastestLiveByUsername(username);
+
+    return result;
+  }
+
+  @Public()
   @Post('/start')
   async startLivestream(
     @Query('key') key: string,
     @Query('userId') id: string,
     @Body() body: any,
   ): Promise<any> {
-    console.log('hello rtmp');
-
-    console.log('Request Params:', body);
-
     const result = await this._livestreamService.startLivestream(
       id,
       body.liveId,
       key,
     );
-    console.log('controller ' + result);
     return result;
   }
 }

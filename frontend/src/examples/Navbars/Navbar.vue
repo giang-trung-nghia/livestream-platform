@@ -11,8 +11,7 @@ const showUserMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
 const isLogin = computed(() => store.state.username !== "");
-const avtImageSrc = "@/assets/img/team-2.jpg";
-
+const avtImageSrc = computed(() => store.state.avatarUrl).value
 const route = useRoute();
 const router = useRouter();
 
@@ -93,10 +92,10 @@ const closeUserMenu = () => {
               @blur="closeUserMenu"
             >
               <argon-avatar
-                class="w-60 mt-2"
-                Circular="true"
+                class="mt-2"
+                circular="true"
                 :image="avtImageSrc"
-                alt="logo"
+                alt="avt"
               />
             </a>
             <ul

@@ -1,6 +1,5 @@
 import { Column, ObjectIdColumn } from 'typeorm';
 import { ObjectId } from 'mongodb';
-
 export class BaseEntity {
   @ObjectIdColumn()
   _id: ObjectId;

@@ -51,3 +51,12 @@ const getClasses = (shadow, circular, borderRadius) => {
     />
   </div>
 </template>
+
+<style scoped>
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+</style>

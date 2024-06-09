@@ -32,8 +32,6 @@ export class BaseService<T extends BaseEntity> {
   }
 
   async create(data: DeepPartial<T>): Promise<T> {
-    data.createdAt = new Date();
-    data.updatedAt = new Date();
     const entity = this.repository.create(data);
     return await this.repository.save(entity);
   }

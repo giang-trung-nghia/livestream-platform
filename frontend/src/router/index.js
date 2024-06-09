@@ -4,6 +4,7 @@ import Livestream from "../views/Livestream.vue"
 import Tables from "../views/Tables.vue";
 import Billing from "../views/Billing.vue";
 import VirtualReality from "../views/VirtualReality.vue";
+import LivestreamRoom from "../views/LivestreamRoom.vue";
 import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
@@ -21,10 +22,15 @@ const routes = [
     component: Dashboard,
   },
   {
-    path: "/live",
+    path: "/me/live",
     name: "Livestream",
     component: Livestream,
     meta: { requiresAuth: true }
+  },
+  {
+    path: "/live/:username",
+    name: "LivestreamRoom",
+    component: LivestreamRoom,
   },
   {
     path: "/tables",

@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { BaseEntity } from 'src/common/base/base.entity';
 import { Column, Entity } from 'typeorm';
 
@@ -6,12 +5,15 @@ import { Column, Entity } from 'typeorm';
   name: 'comment',
 })
 export class CommentEntity extends BaseEntity {
-  @Column({ nullable: false })
-  livestreamId: ObjectId;
+  @Column()
+  livestreamId: string;
 
-  @Column({ nullable: false })
-  userId: ObjectId;
+  @Column()
+  userId: string;
 
-  @Column({ nullable: false })
+  @Column()
+  userFullname: string;
+
+  @Column()
   content: string;
 }

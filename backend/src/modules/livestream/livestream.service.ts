@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,6 +13,7 @@ import { ObjectId } from 'mongodb';
 import { UserService } from '../users/users.service';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateLivestreamDto } from './dto/create-livestream.dto';
+import { CategoryService } from '../categories/category.service';
 
 @Injectable()
 export class LivestreamService extends BaseService<LivestreamEntity> {
@@ -19,6 +21,7 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     @InjectRepository(LivestreamEntity)
     private readonly _repo: Repository<LivestreamEntity>,
     private readonly _userService: UserService,
+    private readonly _categoryService: CategoryService,
   ) {
     super(_repo);
   }
@@ -27,6 +30,7 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     const latestLivestream = await this._repo.findOne({
       where: {
         userId: id as unknown as ObjectId,
+        endTime: null,
       },
       order: {
         createdAt: 'DESC',
@@ -35,15 +39,33 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
 
     if (
       latestLivestream &&
-      this.isStreamKeyExpires(latestLivestream.streamKeyExpiresAt)
+      !this.isStreamKeyExpired(latestLivestream.streamKeyExpiresAt)
     ) {
       latestLivestream.streamingKey =
-        latestLivestream.streamingKey +
-        '?liveId=' +
-        latestLivestream._id +
-        '&userId=' +
-        latestLivestream.userId;
+        this.generateStreamingKey(latestLivestream);
       return latestLivestream;
+    }
+    return null;
+  }
+
+  async findLastestLiveByUsername(username: string): Promise<LivestreamEntity> {
+    const latestLivestream = await this._repo.findOne({
+      where: {
+        username: username,
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    if (!latestLivestream) {
+      throw new BadRequestException('Not have livestream');
+    } else {
+      if (!this.isStreamKeyExpired(latestLivestream.streamKeyExpiresAt)) {
+        latestLivestream.streamingKey =
+          this.generateStreamingKey(latestLivestream);
+        return latestLivestream;
+      }
     }
     return null;
   }
@@ -58,22 +80,44 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
       where: {
         endTime: null,
       },
+      order: {
+        startTime: 'DESC',
+      },
     });
-    return new PagingResponse<LivestreamEntity>(data, total, page, size);
+
+    const listCategory = await this._categoryService.findAll();
+
+    const dataWithUser = await Promise.all(
+      data.map(async (live) => {
+        const user = await this._userService.findOneById(live.userId);
+        return {
+          ...live,
+          name: user?.name,
+          username: user?.username,
+          avatar: user?.avatar,
+          thumbnail: user?.thumbnail,
+          categories: listCategory
+            .filter((x) => live.categories.includes(x.value))
+            .map((e) => e.name),
+        };
+      }),
+    );
+
+    return new PagingResponse<any>(dataWithUser, total, page, size);
   }
 
   async create(data: CreateLivestreamDto): Promise<LivestreamEntity> {
     data.createdAt = new Date();
     data.updatedAt = new Date();
-    console.log(data);
 
     const entity = await this._repo.save(data);
-    console.log(entity);
     entity.startTime = new Date();
+    const user = await this._userService.findOneById(data.userId);
+    const result = this.generateRtmpKey(entity);
+    result.username = user.username;
+    result.streamingKey = this.generateStreamingKey(result);
 
-    const result = this.generateStreamKey(entity);
     await this._repo.update(result._id, result);
-    result.streamingKey = await this.getStreamingKey(result._id.toString());
     return result;
   }
 
@@ -86,7 +130,6 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
       throw new ForbiddenException('Id invalid');
     }
     const liveIdObj = new ObjectId(liveId);
-    console.log(liveIdObj);
 
     const live = await this._repo.findOneBy({
       _id: liveIdObj,
@@ -96,7 +139,6 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
 
       throw new NotFoundException('not found live with liveId');
     }
-    console.log(live);
 
     if (!this.authenticateStreamKey(liveId, key)) {
       throw new ForbiddenException('Stream key is not valid');
@@ -108,69 +150,73 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     return live;
   }
 
-  async endLivestream(_id: ObjectId): Promise<LivestreamEntity> {
-    const live = await this.repository.findOne({
+  async endLivestream(id: string): Promise<LivestreamEntity> {
+    const oId = new ObjectId(id);
+    const live = await this._repo.findOne({
       where: {
-        _id,
+        _id: oId,
       },
     });
-    live.endTime = new Date();
-    this.repository.update(_id, live);
+    if (live) {
+      if (live.endTime != null) {
+        throw new BadRequestException('Live was ended');
+      }
+      live.endTime = new Date();
+      this.repository.update(id, live);
+    } else {
+      throw new BadRequestException("Can't found livestream with Id :" + id);
+    }
     return live;
   }
 
   async getStreamingKey(id: string): Promise<string> {
     const latestLivestream = await this.findLastestLiveByUserId(id);
 
-    if (
-      latestLivestream &&
-      this.isStreamKeyExpires(latestLivestream.streamKeyExpiresAt)
-    ) {
-      return (
-        latestLivestream.streamingKey +
-        '?liveId=' +
-        latestLivestream._id +
-        '&userId=' +
-        latestLivestream.userId
-      );
+    if (latestLivestream) {
+      return this.generateStreamingKey(latestLivestream);
     }
     return null;
   }
 
-  generateStreamKey(live: LivestreamEntity): LivestreamEntity {
-    live.streamKeyExpiresAt = new Date();
-    live.streamingKey = uuidv4();
+  generateStreamingKey(live: LivestreamEntity): string {
+    return live.rtmpKey + '?liveId=' + live._id + '&userId=' + live.userId;
+  }
+
+  generateRtmpKey(live: LivestreamEntity): LivestreamEntity {
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    live.streamKeyExpiresAt = date;
+    live.rtmpKey = uuidv4();
 
     return live;
   }
 
   async authenticateStreamKey(
     liveId: string,
-    streamKey: string,
+    rtmpKey: string,
   ): Promise<boolean> {
     const liveIdObj = new ObjectId(liveId);
     const livestream = await this._repo.findOneBy({
       _id: liveIdObj,
     });
-    console.log('authenticate start');
-    console.log(streamKey);
-    console.log(livestream.streamingKey);
+    console.log(livestream.rtmpKey);
     console.log('authenticate process');
 
     if (
-      livestream.streamingKey === streamKey &&
-      this.isStreamKeyExpires(livestream.streamKeyExpiresAt)
+      livestream.rtmpKey === rtmpKey &&
+      this.isStreamKeyExpired(livestream.streamKeyExpiresAt)
     ) {
       return true;
     }
     return false;
   }
 
-  isStreamKeyExpires(expiresAt: Date): boolean {
-    if (expiresAt < new Date()) {
+  isStreamKeyExpired(expiresAt: Date): boolean {
+    const currentTime = new Date();
+    if (currentTime > expiresAt) {
       return true;
     } else {
-      throw new ForbiddenException('expired streaming key');
+      return false;
     }
   }
 }

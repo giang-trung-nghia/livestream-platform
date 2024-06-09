@@ -4,7 +4,9 @@ import { CategoryEntity } from './category.entity';
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category.dto';
 import { plainToInstance } from 'class-transformer';
+import { Public } from 'src/common/public_key';
 
+@Public()
 @Controller('category')
 export class CategoryController extends BaseController<
   CategoryEntity,

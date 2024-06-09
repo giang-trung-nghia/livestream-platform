@@ -8,9 +8,16 @@ import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonCheckbox from "@/components/ArgonCheckbox.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import axios from "@/services/axios.js";
+import DialogComponent from "@/components/DialogComponent.vue";
 export default defineComponent({
   data() {
-    return { username: "", email: "", password: "" };
+    return {
+      username: "",
+      email: "",
+      password: "",
+      dialogTitle: "",
+      dialogMessage: "",
+    };
   },
   name: "Signup",
   components: {
@@ -19,6 +26,7 @@ export default defineComponent({
     ArgonInput,
     ArgonCheckbox,
     ArgonButton,
+    DialogComponent,
   },
   setup() {
     const body = document.getElementsByTagName("body")[0];
@@ -42,13 +50,18 @@ export default defineComponent({
   methods: {
     async onClickSignup() {
       try {
-        const response = await axios.post("auth/signup", {
+        await axios.post("auth/signup", {
           username: this.username,
           password: this.password,
           email: this.email,
-        })
-        console.log("Signup successful:", response.data);
+        });
+        this.$router.push({ name: "Signin" });
       } catch (error) {
+        this.dialogTitle = "Error";
+        this.dialogMessage = error.response
+          ? error.response.data.message
+          : "An error occurred during signup.";
+        this.$refs.dialog.show();
         console.error("Error during signup:", error);
       }
     },
@@ -252,5 +265,6 @@ export default defineComponent({
       </div>
     </div>
   </main>
+  <DialogComponent ref="dialog" :title="dialogTitle" :message="dialogMessage" />
   <app-footer />
 </template>

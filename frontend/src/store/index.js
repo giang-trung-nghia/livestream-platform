@@ -16,7 +16,9 @@ export default createStore({
     showNavbar: true,
     showFooter: true,
     showMain: true,
+    avatarUrl: "",
     layout: "default",
+    fullname: "",
     username: "",
     userId: "",
     token: "",
@@ -61,23 +63,28 @@ export default createStore({
     clearAuth(state) {
       state.username = "";
       state.userId = "";
+      state.avatarUrl = "";
       state.token = "";
     },
-    setLivestreaming(state) {
-      state.isLivestreaming = state
-    },
     setLivestreamingId(state, livestreamId) {
-      state.isLivestreaming = livestreamId
+      state.livestreamingId = livestreamId
+    },
+    setAvatarUrl(state, avatarUrl) {
+      state.avatarUrl = avatarUrl
+    },
+    setFullname(state, fullname) {
+      state.fullname = fullname
     },
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {
       commit("sidebarType", payload);
     },
-    login({ commit }, { username, userId, token }) {
+    login({ commit }, { username, userId, token, avatar }) {
       commit('setUsername', username);
       commit('setUserId', userId);
       commit('setToken', token);
+      commit('setAvatarUrl', avatar)
       localStorage.setItem('token', token);
     },
     logout({ commit }) {
@@ -92,11 +99,16 @@ export default createStore({
       if (token) {
         commit('setToken', token);
       }
-    }
+    },
+    setFullname({ commit }, fullname) {
+      commit('setFullname', fullname);
+    },
   },
   getters: {
     isLogin: (state) => state.username !== '',
     getToken: (state) => state.token,
     livestreamingId: (state) => state.livestreamingId,
+    getAvatarUrl: (state) => state.avatar,
+    getFullname: (state) => state.fullname
   },
 });

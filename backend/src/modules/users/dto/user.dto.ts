@@ -15,7 +15,10 @@ export class UserDto extends BaseDto {
   about: string;
 
   @Expose()
-  address: string;
+  avatar: string;
+
+  @Expose()
+  thumbnail: string;
 
   @Expose()
   dob: string;

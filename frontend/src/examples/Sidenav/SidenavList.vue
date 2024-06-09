@@ -83,7 +83,7 @@ const getRoute = () => {
 
       <li class="nav-item" v-if="isLogin">
         <sidenav-item
-          to="/live"
+          to="/me/live"
           :class="getRoute() === 'livestream' ? 'active' : ''"
           navText="Livestream"
         >

@@ -22,6 +22,12 @@ export class LivestreamEntity extends BaseEntity {
   userId: ObjectId;
 
   @Column()
+  username: string;
+
+  @Column()
+  avatar: string;
+
+  @Column()
   thumbnail: string;
 
   @Column()
@@ -29,6 +35,9 @@ export class LivestreamEntity extends BaseEntity {
 
   @Column()
   streamingKey: string;
+
+  @Column()
+  rtmpKey: string;
 
   @Column()
   streamKeyExpiresAt: Date;

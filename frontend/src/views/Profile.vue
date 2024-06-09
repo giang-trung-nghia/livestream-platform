@@ -18,7 +18,8 @@ const username = ref("");
 const email = ref("");
 const name = ref("");
 const password = ref("");
-const address = ref("");
+const thumbnail = ref("");
+const avatar = ref("");
 const about = ref("");
 const dialog = ref(null);
 
@@ -27,7 +28,8 @@ const onSave = () => {
     axios
       .put(`/user/${userId.value}`, {
         name: name.value,
-        address: address.value,
+        thumbnail: thumbnail.value,
+        avatar: avatar.value,
         about: about.value,
         password: password.value,
       })
@@ -40,7 +42,10 @@ const onSave = () => {
         isEdit.value = false;
       })
       .catch((err) => {
-        console.error("Error updating user information:", err.response.data.message);
+        console.error(
+          "Error updating user information:",
+          err.response.data.message
+        );
         dialogMessage.value = `Failed to update user information ${err.response.data.message}`;
         if (dialog.value) {
           dialog.value.show();
@@ -74,7 +79,8 @@ onBeforeMount(() => {
       email.value = res.data.email;
       name.value = res.data.name;
       password.value = res.data.password;
-      address.value = res.data.address;
+      avatar.value = res.data.avatar;
+      thumbnail.value = res.data.thumbnail;
       about.value = res.data.about;
     });
   } catch (error) {
@@ -92,7 +98,7 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <main>
-    <div class="container-fluid ">
+    <div class="container-fluid">
       <div
         class="page-header min-height-300"
         style="
@@ -101,17 +107,17 @@ onBeforeUnmount(() => {
           margin-left: -34%;
         "
       >
-        <span class="mask bg-gradient-success opacity-6 "></span>
+        <span class="mask bg-gradient-success opacity-6"></span>
       </div>
       <div class="card shadow-lg mt-n12">
         <div class="card-body p-3">
           <div class="row gx-4">
-            <div class="col-auto">
-              <div class="avatar avatar-xl position-relative">
+            <div class="col-auto d-flex"> 
+              <div class="  avatar avatar-xl position-relative">
                 <img
-                  src="../assets/img/team-1.jpg"
+                  :src="avatar"
                   alt="profile_image"
-                  class="shadow-sm w-100 border-radius-lg"
+                  class="fit-cover shadow-sm w-100 border-radius-lg"
                 />
               </div>
             </div>
@@ -354,11 +360,21 @@ onBeforeUnmount(() => {
                 </div>
                 <div class="col-md-12">
                   <label for="example-text-input" class="form-control-label"
-                    >Address</label
+                    >Avatar</label
                   >
                   <argon-input
                     type="text"
-                    v-model="address"
+                    v-model="avatar"
+                    :disabled="!isEdit"
+                  />
+                </div>
+                <div class="col-md-12">
+                  <label for="example-text-input" class="form-control-label"
+                    >Thumbnail</label
+                  >
+                  <argon-input
+                    type="text"
+                    v-model="thumbnail"
                     :disabled="!isEdit"
                   />
                 </div>
@@ -397,5 +413,11 @@ onBeforeUnmount(() => {
 
 .overflow {
   overflow-x: hidden;
+}
+
+.fit-cover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 </style>

@@ -42,7 +42,9 @@ export class UserService {
     const result = await this._userRepository.findOneBy({
       _id: objectId,
     });
-
+    if (!result) {
+      throw new BadRequestException('Not found userId: ' + id);
+    }
     const dto = plainToInstance(UserDto, result, {
       excludeExtraneousValues: true,
     });

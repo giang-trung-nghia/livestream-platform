@@ -10,6 +10,7 @@ import { join } from 'path';
 import { CommentModule } from './modules/comments/comment.module';
 import { GiftModule } from './modules/gifts/gift.module';
 import { CategoryModule } from './modules/categories/category.module';
+import { CommentsGateway } from './modules/comments/comments.gateway';
 
 @Module({
   imports: [
@@ -34,6 +35,6 @@ import { CategoryModule } from './modules/categories/category.module';
     CategoryModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CommentsGateway],
 })
 export class AppModule {}

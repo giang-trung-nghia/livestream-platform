@@ -12,7 +12,10 @@ export class UpdateUserDto extends BaseDto {
   about: string;
 
   @Expose()
-  address: string;
+  avatar: string;
+
+  @Expose()
+  thumbnail: string;
 
   @Expose()
   role: string;

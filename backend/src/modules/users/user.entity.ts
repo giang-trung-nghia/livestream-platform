@@ -34,6 +34,12 @@ export class UserEntity extends BaseEntity {
   money: number;
 
   @Column()
+  avatar: string;
+
+  @Column()
+  thumbnail: string;
+
+  @Column()
   comment: CommentEntity;
 
   @Column()

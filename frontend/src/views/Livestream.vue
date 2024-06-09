@@ -21,7 +21,6 @@ export default {
       srcVideo: String,
       isCreateLive: false,
       title: "",
-      thumbnailUrl: "",
       streamingKey: "",
       streamingURL: "",
       dialogTitle: "",
@@ -39,12 +38,10 @@ export default {
 
   async mounted() {
     const store = useStore();
-    const isLivestreaming = computed(() => store.state.isLivestreaming);
+    // const isLivestreaming = computed(() => store.state.isLivestreaming);
     const userId = computed(() => store.state.userId);
     this.userId = userId.value;
-    if (!isLivestreaming.value) {
-      await this.fetchStreamingInfoByUserId(userId.value);
-    }
+    await this.fetchStreamingInfoByUserId(userId.value);
 
     this.streamingURL = process.env.VUE_APP_LIVESTREAM_URL;
   },
@@ -72,25 +69,46 @@ export default {
             data.categories.includes(x.value)
           );
           this.streamingKey = res.data.streamingKey;
+          this.$store.dispatch("setLivestreamingId", res.data._id);
         }
       } catch (error) {
         console.error("Error generating streaming key:", error);
       }
     },
 
-    async createLivestream(store) {
+    async createLivestream() {
       try {
         const res = await axios.post(`/live`, {
           title: this.title,
-          thumbnail: this.thumbnailUrl,
           userId: this.userId,
           categories: this.selectedCategories.map((e) => e.value),
         });
 
-        console.log(res.data);
         this.streamingKey = res.data.streamingKey;
-        store.dispatch("setLivestreamingId", res.data._id);
+        this.$store.dispatch("setLivestreamingId", res.data._id);
       } catch (error) {
+        this.dialogTitle = "Error";
+        this.dialogMessage = error.response
+          ? error.response.data.message[0]
+          : "An error occurred during create live.";
+        this.$refs.dialog.show();
+        console.error("Error fetching categories:", error);
+      }
+    },
+
+    async endLivestream() {
+      try {
+        const liveId = this.$store.getters.livestreamingId;
+        console.log(this.$store.getters.livestreamingId);
+        const res = await axios.put(`/live/end/${liveId}`, {});
+        console.log(res);
+        this.isCreateLive = true;
+      } catch (error) {
+        this.dialogTitle = "Error";
+        this.dialogMessage = error.response
+          ? error.response.data.message
+          : "An error occurred during end live.";
+        this.$refs.dialog.show();
         console.error("Error fetching categories:", error);
       }
     },
@@ -98,6 +116,10 @@ export default {
     async onCreate() {
       await this.createLivestream();
       await this.fetchStreamingInfoByUserId(this.userId);
+    },
+
+    async onEndlive() {
+      await this.endLivestream();
     },
   },
 };
@@ -135,8 +157,16 @@ export default {
                         @click="isEdit = !isEdit"
                         color="primary"
                         size="sm"
-                        class="ms-auto"
+                        class="mr-2"
                         >Edit</argon-button
+                      >
+                      <argon-button
+                        v-if="!isCreateLive"
+                        @click="onEndlive"
+                        color="warning"
+                        size="sm"
+                        class="mr-2"
+                        >End Live</argon-button
                       >
                     </div>
                   </div>
@@ -155,18 +185,6 @@ export default {
                           :disabled="!isCreateLive && !isEdit"
                           type="text"
                           v-model="title"
-                        />
-                      </div>
-                      <div class="row">
-                        <label
-                          for="example-text-input"
-                          class="form-control-label"
-                          >Thumbnail URL</label
-                        >
-                        <argon-input
-                          :disabled="!isCreateLive && !isEdit"
-                          type="text"
-                          v-model="thumbnailUrl"
                         />
                       </div>
                     </div>
@@ -201,19 +219,17 @@ export default {
           </div>
         </div>
       </div>
-      <div>
-        <div class="col-lg-10 col-md-10 mt-4 col-12">
-          <MiniStatisticsCard
-            title="Streaming url"
-            :value="streamingURL"
-            :description="`Streaming Key: <p><b>${streamingKey}</b></p>`"
-            :icon="{
-              component: 'ni ni-air-baloon',
-              background: 'bg-gradient-success',
-              shape: 'rounded-circle',
-            }"
-          />
-        </div>
+      <div v-if="streamingKey" class="col-lg-10 col-md-10 mt-4 col-12">
+        <MiniStatisticsCard
+          title="Streaming url"
+          :value="streamingURL"
+          :description="`Streaming Key: <p><b>${streamingKey}</b></p>`"
+          :icon="{
+            component: 'ni ni-air-baloon',
+            background: 'bg-gradient-success',
+            shape: 'rounded-circle',
+          }"
+        />
       </div>
     </div>
   </div>
@@ -227,5 +243,10 @@ export default {
 <style scoped>
 .mr-2 {
   margin-right: 0.5rem;
+}
+
+.multiselect__tags {
+  height: 50px; /* Chiều cao mong muốn */
+  min-height: unset;
 }
 </style>
