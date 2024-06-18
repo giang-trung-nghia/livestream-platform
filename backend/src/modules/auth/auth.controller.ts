@@ -29,14 +29,11 @@ export class AuthController {
   @Public()
   @Post('')
   async authLivestream(@Body() body: any): Promise<any> {
-    console.log('hello rtmp from auth');
-
     const result = await this._liveService.startLivestream(
       body.userId,
       body.liveId,
       body.name,
     );
-    console.log('controller ' + result);
     return result;
   }
 }

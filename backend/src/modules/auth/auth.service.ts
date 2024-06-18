@@ -21,10 +21,8 @@ export class AuthService {
     };
     return {
       token: await this.jwtService.signAsync(payload),
-      username: user.username,
       userId: user._id,
-      avatar: user.avatar,
-      fullname: user.name,
+      userInfo: user,
     };
   }
 
@@ -37,6 +35,7 @@ export class AuthService {
       createUserDto.email,
       'email',
     );
+    createUserDto.name = createUserDto.username;
     if (userByUsername && userByEmail) {
       throw new BadRequestException(
         'Username or Email is existed. Please try again!',

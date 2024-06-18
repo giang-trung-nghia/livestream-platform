@@ -6,9 +6,6 @@ export class UpdateUserDto extends BaseDto {
   name: string;
 
   @Expose()
-  password: string;
-
-  @Expose()
   about: string;
 
   @Expose()
@@ -16,6 +13,9 @@ export class UpdateUserDto extends BaseDto {
 
   @Expose()
   thumbnail: string;
+
+  @Expose()
+  categories: Array<number>;
 
   @Expose()
   role: string;

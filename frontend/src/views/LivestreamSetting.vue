@@ -43,15 +43,15 @@ export default {
     this.userId = userId.value;
     await this.fetchStreamingInfoByUserId(userId.value);
 
-    this.streamingURL = process.env.VUE_APP_LIVESTREAM_URL;
+    this.streamingURL = process.env.VUE_APP_IP + process.env.VUE_APP_PORT_LIVE;
   },
   methods: {
     async fetchCategories() {
       try {
-        const res = await axios.get(`/category`);
+        const res = await axios.get('/category');
         this.categories = res.data;
       } catch (error) {
-        console.error("Error fetching categories:", error);
+        console.error(error);
       }
     },
 
@@ -72,7 +72,7 @@ export default {
           this.$store.dispatch("setLivestreamingId", res.data._id);
         }
       } catch (error) {
-        console.error("Error generating streaming key:", error);
+        console.error(error);
       }
     },
 
@@ -92,14 +92,13 @@ export default {
           ? error.response.data.message[0]
           : "An error occurred during create live.";
         this.$refs.dialog.show();
-        console.error("Error fetching categories:", error);
+        console.error(error);
       }
     },
 
     async endLivestream() {
       try {
         const liveId = this.$store.getters.livestreamingId;
-        console.log(this.$store.getters.livestreamingId);
         const res = await axios.put(`/live/end/${liveId}`, {});
         console.log(res);
         this.isCreateLive = true;
@@ -109,7 +108,7 @@ export default {
           ? error.response.data.message
           : "An error occurred during end live.";
         this.$refs.dialog.show();
-        console.error("Error fetching categories:", error);
+        console.error(error);
       }
     },
 

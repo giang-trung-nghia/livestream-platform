@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
@@ -11,7 +11,7 @@ const showUserMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
 const isLogin = computed(() => store.state.username !== "");
-const avtImageSrc = computed(() => store.state.avatarUrl).value
+const avtImageSrc = ref(""); // Sử dụng ref để lưu trữ giá trị ban đầu
 const route = useRoute();
 const router = useRouter();
 
@@ -41,6 +41,18 @@ const closeUserMenu = () => {
     showUserMenu.value = false;
   }, 100);
 };
+onMounted(() => {
+  if (store.state.userInfo.avatar) {
+    avtImageSrc.value = store.state.userInfo.avatar;
+  }
+});
+
+watch(
+  () => store.state.userInfo.avatar,
+  (newValue) => {
+    avtImageSrc.value = newValue;
+  }
+);
 </script>
 <template>
   <nav
@@ -93,7 +105,7 @@ const closeUserMenu = () => {
             >
               <argon-avatar
                 class="mt-2"
-                circular="true"
+                :circular="true"
                 :image="avtImageSrc"
                 alt="avt"
               />
@@ -111,6 +123,20 @@ const closeUserMenu = () => {
                   <div class="py-1 d-flex">
                     <div class="d-flex flex-column justify-content-center">
                       <h6 class="mb-1 text-sm font-weight-normal">Profile</h6>
+                    </div>
+                  </div>
+                </router-link>
+              </li>
+              <li class="mb-1">
+                <router-link
+                  to="/me/live"
+                  class="dropdown-item border-radius-md"
+                >
+                  <div class="py-1 d-flex">
+                    <div class="d-flex flex-column justify-content-center">
+                      <h6 class="mb-1 text-sm font-weight-normal">
+                        Livestream setting
+                      </h6>
                     </div>
                   </div>
                 </router-link>

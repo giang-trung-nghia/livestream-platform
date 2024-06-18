@@ -70,9 +70,10 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     return null;
   }
 
-  async findPaging(
+  async findPagingFilter(
     page: number,
     size: number,
+    category: string,
   ): Promise<PagingResponse<LivestreamEntity>> {
     const [data, total] = await this.repository.findAndCount({
       skip: (page - 1) * size,
@@ -86,9 +87,14 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     });
 
     const listCategory = await this._categoryService.findAll();
+    let dataFiltered = data;
+    if (category) {
+      const categoryId = parseInt(category, 10);
+      dataFiltered = data.filter((x) => x.categories.includes(categoryId));
+    }
 
     const dataWithUser = await Promise.all(
-      data.map(async (live) => {
+      dataFiltered.map(async (live) => {
         const user = await this._userService.findOneById(live.userId);
         return {
           ...live,
@@ -111,7 +117,6 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     data.updatedAt = new Date();
 
     const entity = await this._repo.save(data);
-    entity.startTime = new Date();
     const user = await this._userService.findOneById(data.userId);
     const result = this.generateRtmpKey(entity);
     result.username = user.username;
@@ -143,7 +148,6 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     if (!this.authenticateStreamKey(liveId, key)) {
       throw new ForbiddenException('Stream key is not valid');
     }
-    console.log('authenticate success');
 
     live.startTime = new Date();
     this.repository.update(live._id, live);

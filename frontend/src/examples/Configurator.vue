@@ -54,7 +54,6 @@ const darkMode = () => {
         </div>
         <!-- End Toggle Button -->
       </div>
-      <hr class="my-1 horizontal dark" />
       <div class="pt-0 card-body pt-sm-3">
         <!-- Sidebar Backgrounds -->
         <div>
@@ -140,11 +139,6 @@ const darkMode = () => {
             />
           </div>
         </div>
-        <a
-          class="btn bg-gradient-dark w-100"
-          href="https://www.creative-tim.com/product/vue-argon-dashboard"
-          >Free Download</a
-        >
         <a
           class="btn btn-outline-dark w-100"
           href="https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/"

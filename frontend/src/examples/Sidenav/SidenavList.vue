@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref, watch, onUpdated } from "vue";
 import { useRoute } from "vue-router";
 import { useStore } from "vuex";
 
@@ -7,12 +7,37 @@ import SidenavItem from "./SidenavItem.vue";
 
 const store = useStore();
 const isLogin = computed(() => store.state.username !== "");
-
+const listCategory = computed(() => store.state.listCategory);
+const isOpenCategory = ref("");
+const username = ref("");
+const route = useRoute();
 const getRoute = () => {
   const route = useRoute();
+
   const routeArr = route.path.split("/");
   return routeArr[1];
 };
+
+const selectedCategory = ref(route.query.category);
+
+const selectCategory = (categoryValue) => {
+  selectedCategory.value = categoryValue;
+};
+
+const onToggleCategory = () => {
+  isOpenCategory.value = !isOpenCategory.value;
+};
+
+watch(
+  () => route.query.category,
+  (newValue) => {
+    selectedCategory.value = newValue;
+  },
+);
+
+onUpdated(() => {
+  username.value = computed(() => store.state.userInfo).value.username;
+});
 </script>
 <template>
   <div
@@ -32,32 +57,30 @@ const getRoute = () => {
         </sidenav-item>
       </li>
 
-      
-
-      <li class="nav-item">
-        <sidenav-item
-          to="/tables"
-          :class="getRoute() === 'tables' ? 'active' : ''"
-          :navText="'Tables'"
-        >
+      <li class="nav-item" @click="onToggleCategory">
+        <sidenav-item :navText="'Category'" type="main-router">
           <template v-slot:icon>
-            <i
-              class="ni ni-calendar-grid-58 text-warning text-sm opacity-10"
-            ></i>
+            <i class="ni ni-bullet-list-67 text-primary text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>
 
-      <li class="nav-item">
-        <sidenav-item
-          to="/billing"
-          :class="getRoute() === 'billing' ? 'active' : ''"
-          :navText="'Billing'"
-        >
-          <template v-slot:icon>
-            <i class="ni ni-credit-card text-success text-sm opacity-10"></i>
-          </template>
-        </sidenav-item>
+      <li class="nav-item" v-show="isOpenCategory">
+        <ul class="navbar-nav">
+          <li
+            v-for="category in listCategory"
+            :key="category.id"
+            class="nav-item sub-item"
+            @click="selectCategory(category.value)"
+            :class="{ active: selectedCategory === category.value }"
+          >
+            <sidenav-item
+              :to="`/menu?category=${category.value}`"
+              :navText="category.name"
+              type="sub-router"
+            />
+          </li>
+        </ul>
       </li>
 
       <li class="mt-3 nav-item">
@@ -85,7 +108,19 @@ const getRoute = () => {
         <sidenav-item
           to="/me/live"
           :class="getRoute() === 'livestream' ? 'active' : ''"
-          navText="Livestream"
+          navText="Livestream Setting"
+        >
+          <template v-slot:icon>
+            <i class="ni ni-settings text-primary text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+
+      <li class="nav-item" v-if="isLogin">
+        <sidenav-item
+          :to="`/live/${username}`"
+          :class="getRoute() === `${username}` ? 'active' : ''"
+          navText="My livestream"
         >
           <template v-slot:icon>
             <i class="ni ni-laptop text-primary text-sm opacity-10"></i>
@@ -119,3 +154,15 @@ const getRoute = () => {
     </ul>
   </div>
 </template>
+
+<style scoped>
+.active {
+  background-color: #f6f9fc;
+}
+
+.sub-item {
+  padding-left: 10px;
+  font-size: 12px;
+  height: 48px;
+}
+</style>

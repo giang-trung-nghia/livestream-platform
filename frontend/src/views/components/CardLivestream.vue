@@ -18,6 +18,9 @@ export default {
       type: String,
       required: true,
     },
+    fullname: {
+      type: String
+    },
     thumbnailSrc: {
       type: String,
       default:
@@ -51,14 +54,14 @@ export default {
         <div class="live-avatar">
           <argon-avatar
             class="w-60 mt-2"
-            circular="true"
+            :circular="true"
             size="lg"
             :image="avtImageSrc"
           />
         </div>
         <div class="user">
           <b class="title">{{ title }}</b>
-          <p class="username">{{ name }}</p>
+          <p class="fullname">{{ fullname }}</p>
           <span
             class="badge badge-sm bg-gradient-dark mr-1"
             v-for="category in categories"
@@ -74,7 +77,7 @@ export default {
 
 <style scoped>
 .card-livestream {
-  height: 15rem;
+  height: 14rem;
   --bs-card-border-width: 0;
   overflow: hidden;
 }
@@ -89,7 +92,7 @@ export default {
 
 .thumbnail {
   width: 100%;
-  height: 10rem;
+  height: 9rem;
   overflow: hidden;
 }
 
@@ -97,13 +100,24 @@ export default {
   object-fit: cover;
 }
 
+.title, .fullname {
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .title {
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .infor {
+  width: 100%;
   height: 5rem;
   align-items: center;
+}
+
+.user{
+  width: 100%;
 }
 
 .infor p {

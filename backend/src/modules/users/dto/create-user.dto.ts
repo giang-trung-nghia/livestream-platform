@@ -9,6 +9,9 @@ export class CreateUserDto extends BaseDto {
   password: string;
 
   @Expose()
+  name: string;
+
+  @Expose()
   email: string;
 
   @Expose()

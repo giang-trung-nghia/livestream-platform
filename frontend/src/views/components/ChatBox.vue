@@ -13,7 +13,9 @@
           class="form-control"
           v-model="newComment"
           @keyup.enter="postComment"
-          placeholder="Type your comment here..."
+          :placeholder="
+            isLogin ? 'Type your comment here...' : 'Sign in to comment...'
+          "
           :disabled="!isLogin"
         />
         <div class="input-group-append">
@@ -98,8 +100,8 @@ function scrollToBottom() {
 }
 
 function setupWebSocket() {
-  socket = io("http://localhost:3001"); // Kết nối tới WebSocket server
- console.log(socket.id);
+  socket = io(`${process.env.VUE_APP_IP}${process.env.VUE_APP_PORT_WEBSOCKET}`); // Kết nối tới WebSocket server
+  console.log(socket.id);
 
   socket.on("newComment", (data) => {
     comments.value.push(data);

@@ -1,7 +1,7 @@
 <template>
   <div class="embed-responsive embed-responsive-16by9">
     <div v-if="videoError">
-      <img :src="placeholderImage" alt="Video not available" />
+      <img class="image" :src="placeholderImage" alt="Video not available" />
     </div>
     <video
       v-else
@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { ref } from "vue";
 import videojs from "video.js";
 import "video.js/dist/video-js.css";
 
@@ -24,8 +23,6 @@ export default {
   data() {
     return {
       currentTime: 0,
-      isPlaying: true,
-      isMuted: false,
       player: null,
       videoError: false,
     };
@@ -40,61 +37,70 @@ export default {
     },
     placeholderImage: {
       type: String,
-      default: "",
+      default:
+        "https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     },
   },
-  setup(props) {
-    const livestream = ref(null);
-    console.log(props);
-
-    return {
-      livestream,
-    };
-  },
-  methods: {
-    enterRoom() {
-      // Logic to enter room
-      console.log("Entering room...");
+  watch: {
+    src(newSrc) {
+      this.videoError = false;
+      if (this.player) {
+        const currentTime = this.player.currentTime();
+        this.player.src({ src: newSrc, type: "application/x-mpegURL" });
+        this.player.currentTime(currentTime);
+        this.player.play().catch((error) => {
+          console.log("play() error:", error);
+        });
+      }
     },
   },
   mounted() {
-    this.player = videojs("video-player", {
-      html5: {
-        hls: {
-          overrideNative: true,
-        },
-      },
-    });
-    try {
-      this.player.ready(() => {
-        this.player.on("loadedmetadata", () => {
-          this.player.currentTime(this.player.duration());
-        });
-
-        // Prevent seeking
-        this.player.on("seeking", () => {
-          if (this.player.currentTime() > this.player.duration() - 10) {
-            this.player.currentTime(this.player.duration());
-          }
-        });
-
-        this.player.on("ended", () => {
-          this.player.pause();
-        });
-
-        // Handle video error
-        this.player.on("error", () => {
-          this.videoError = true;
-        });
-      });
-    } catch (error) {
-      console.log(error);
-    }
+    this.initializePlayer();
   },
   beforeUnmount() {
     if (this.player) {
       this.player.dispose();
     }
+  },
+  methods: {
+    initializePlayer() {
+      this.player = videojs("video-player", {
+        html5: {
+          hls: {
+            overrideNative: true,
+          },
+        },
+      });
+      try {
+        this.player.ready(() => {
+          this.player.on("loadedmetadata", () => {
+            console.log("loaded meta data");
+            this.player.currentTime(this.player.duration());
+          });
+
+          // Prevent seeking
+          this.player.on("seeking", () => {
+            console.log("seeking");
+            if (this.player.currentTime() > this.player.duration() - 10) {
+              this.player.currentTime(this.player.duration());
+            }
+          });
+
+          this.player.on("ended", () => {
+            console.log("ended");
+            this.player.pause();
+          });
+
+          // Handle video error
+          this.player.on("error", () => {
+            this.videoError = true;
+            this.$emit("videoError");
+          });
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>
@@ -138,5 +144,11 @@ export default {
   background-color: black;
   justify-content: center;
   align-items: center;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 </style>

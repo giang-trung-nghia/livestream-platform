@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import axios from "../services/axios";
 
 export default createStore({
   state: {
@@ -16,14 +17,13 @@ export default createStore({
     showNavbar: true,
     showFooter: true,
     showMain: true,
-    avatarUrl: "",
     layout: "default",
-    fullname: "",
-    username: "",
     userId: "",
+    userInfo: "",
+    listCategory: "",
     token: "",
-    isLivestreaming : false,
-    livestreamingId: ""
+    isLivestreaming: false,
+    livestreamingId: "",
   },
   mutations: {
     toggleConfigurator(state) {
@@ -63,52 +63,81 @@ export default createStore({
     clearAuth(state) {
       state.username = "";
       state.userId = "";
-      state.avatarUrl = "";
       state.token = "";
     },
     setLivestreamingId(state, livestreamId) {
-      state.livestreamingId = livestreamId
+      state.livestreamingId = livestreamId;
     },
-    setAvatarUrl(state, avatarUrl) {
-      state.avatarUrl = avatarUrl
+    setUserInfo(state, userInfo) {
+      state.userInfo = userInfo;
     },
-    setFullname(state, fullname) {
-      state.fullname = fullname
+    setListCategory(state, listCategory) {
+      state.listCategory = listCategory;
     },
   },
   actions: {
     toggleSidebarColor({ commit }, payload) {
       commit("sidebarType", payload);
     },
-    login({ commit }, { username, userId, token, avatar }) {
-      commit('setUsername', username);
-      commit('setUserId', userId);
-      commit('setToken', token);
-      commit('setAvatarUrl', avatar)
-      localStorage.setItem('token', token);
+    login({ commit }, { username, userId, token, userInfo }) {
+      commit("setUsername", username);
+      commit("setUserId", userId);
+      commit("setToken", token);
+      commit("setUserInfo", userInfo);
+      localStorage.setItem("token", token);
+      localStorage.setItem("userId", userId);
+      localStorage.setItem("userInfo", userInfo);
     },
     logout({ commit }) {
-      commit('clearAuth');
-      localStorage.removeItem('token');
+      commit("clearAuth");
+      localStorage.removeItem("token");
+      localStorage.removeItem("userId");
+      localStorage.removeItem("userInfo");
+      
     },
     setLivestreamingId({ commit }, id) {
-      commit('setLivestreamingId', id);
+      commit("setLivestreamingId", id);
     },
     initializeAuth({ commit }) {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
-        commit('setToken', token);
+        commit("setToken", token);
       }
     },
-    setFullname({ commit }, fullname) {
-      commit('setFullname', fullname);
+    setUserInfo({ commit }, userInfo) {
+      commit("setUserInfo", userInfo);
+    },
+    setListCategory({ commit }, listCategory) {
+      commit("setListCategory", listCategory);
+    },
+    async fetchUserInfo({ commit }, userId) {
+      try {
+        const response = await axios.get(`user/${userId}`);
+        commit("setUserInfo", response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    },
+    async checkAndRestoreLogin({ commit, dispatch }) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const userId = localStorage.getItem("userId");
+
+        commit("setUserId", userId);
+        commit("setToken", token);
+
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+        await dispatch("fetchUserInfo", userId);
+      }
     },
   },
   getters: {
-    isLogin: (state) => state.username !== '',
+    isLogin: (state) => state.username !== "",
     getToken: (state) => state.token,
     livestreamingId: (state) => state.livestreamingId,
-    getAvatarUrl: (state) => state.avatar,
-    getFullname: (state) => state.fullname
+    getUserInfo: (state) => state.userInfo,
+    getListCategory: (state) => state.listCategory,
   },
 });

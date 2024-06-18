@@ -40,6 +40,9 @@ export class UserEntity extends BaseEntity {
   thumbnail: string;
 
   @Column()
+  categories: Array<number>;
+
+  @Column()
   comment: CommentEntity;
 
   @Column()

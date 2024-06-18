@@ -77,9 +77,6 @@ export class UserService {
   }
 
   async update(id: ObjectId, userUpdateDto: UpdateUserDto): Promise<UserDto> {
-    if (userUpdateDto.password.length < 6) {
-      throw new BadRequestException('Password must longer than 6 characters!');
-    }
     userUpdateDto.updatedAt = new Date();
 
     await this._userRepository.update(id, userUpdateDto);

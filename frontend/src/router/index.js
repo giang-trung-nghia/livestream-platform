@@ -1,10 +1,11 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
-import Livestream from "../views/Livestream.vue"
+import LivestreamSetting from "../views/LivestreamSetting.vue"
 import Tables from "../views/Tables.vue";
 import Billing from "../views/Billing.vue";
 import VirtualReality from "../views/VirtualReality.vue";
 import LivestreamRoom from "../views/LivestreamRoom.vue";
+import LivestreamMenu from "../views/LivestreamMenu.vue"
 import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
@@ -24,13 +25,18 @@ const routes = [
   {
     path: "/me/live",
     name: "Livestream",
-    component: Livestream,
+    component: LivestreamSetting,
     meta: { requiresAuth: true }
   },
   {
     path: "/live/:username",
     name: "LivestreamRoom",
     component: LivestreamRoom,
+  },
+  {
+    path: "/menu",
+    name: "Menu",
+    component: LivestreamMenu,
   },
   {
     path: "/tables",

@@ -26,17 +26,21 @@ export default {
     };
   },
   methods: {
-    ...mapActions(["login", "setFullname"]),
+    ...mapActions(["login", "setUserInfo"]),
     async onClickSignin() {
       try {
         const response = await axios.post("auth/signin", {
           password: this.password,
           email: this.email,
         });
-        console.log("Signup successful:", response.data);
-        const { token, username, userId, avatar, fullname } = response.data;
-        this.login({ username, userId, token, avatar });
-        this.setFullname(fullname)
+        const { token, userId, userInfo } = response.data;
+        this.login({
+          username: userInfo.username,
+          userId,
+          token,
+          userInfo: userInfo,
+        });
+        
         this.$router.push({ name: "Dashboard" });
       } catch (error) {
         this.dialogMessage = error.response

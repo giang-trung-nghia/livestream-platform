@@ -12,18 +12,27 @@ export default {
     return {
       srcVideo: "",
       listlive: [],
+      curVideoIndex: 0,
     };
   },
   setup() {},
   async beforeMount() {
-
     const response = await axios.get("/live/paging");
     if (response.data.data) {
       this.listlive = response.data.data;
-      const newLive = this.listlive[0];
-      this.srcVideo = `http://192.168.1.9:8080/hls/${newLive.rtmpKey}/index.m3u8`;
+      const newLive = this.listlive[this.curVideoIndex];
+      this.srcVideo = `${process.env.VUE_APP_IP + process.env.VUE_APP_PORT_HLS}/${newLive.rtmpKey}/index.m3u8`;
       console.log(this.srcVideo);
     }
+  },
+  methods: {
+    onVideoError() {
+      if (this.curVideoIndex < this.listlive.length-1) {
+        this.srcVideo = `${process.env.VUE_APP_IP + process.env.VUE_APP_PORT_HLS}/${this.listlive[++this.curVideoIndex].rtmpKey}/index.m3u8`;
+        console.log(this.curVideoIndex);
+        console.log(this.srcVideo);
+      }
+    },
   },
 };
 </script>
@@ -36,6 +45,7 @@ export default {
             <div class="card z-index-2">
               <VideoComponent
                 :src="srcVideo"
+                @video-error="onVideoError"
                 v-if="srcVideo.length != '0'"
               ></VideoComponent>
             </div>
@@ -50,7 +60,7 @@ export default {
             <card-livestream
               :title="live.title"
               :username="live.username"
-              :name="live.name"
+              :fullname="live.name"
               :categories="live.categories"
               :avtImageSrc="live.avatar"
               :thumbnailSrc="live.thumbnail"

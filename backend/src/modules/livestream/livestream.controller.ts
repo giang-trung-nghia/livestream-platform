@@ -19,11 +19,12 @@ export class LivestreamController extends BaseController<
 
   @Public()
   @Get('paging')
-  async findPaging(
+  async findPagingFilter(
     @Query('page') page: number = 1,
-    @Query('size') size: number = 10,
+    @Query('size') size: number = 20,
+    @Query('category') category: string,
   ): Promise<PagingResponse<LivestreamEntity>> {
-    return this._livestreamService.findPaging(page, size);
+    return this._livestreamService.findPagingFilter(page, size, category);
   }
 
   @Post('')

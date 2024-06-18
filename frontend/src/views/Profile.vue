@@ -7,6 +7,7 @@ import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import axios from "@/services/axios.js";
 import DialogComponent from "@/components/DialogComponent.vue";
+import Multiselect from "vue-multiselect";
 
 const body = document.getElementsByTagName("body")[0];
 const isEdit = ref(false);
@@ -22,6 +23,8 @@ const thumbnail = ref("");
 const avatar = ref("");
 const about = ref("");
 const dialog = ref(null);
+const categories = ref([]);
+const selectedCategories = ref([]);
 
 const onSave = () => {
   try {
@@ -32,9 +35,11 @@ const onSave = () => {
         avatar: avatar.value,
         about: about.value,
         password: password.value,
+        categories: selectedCategories.value.map((e) => e.value),
       })
       .then((res) => {
-        console.log(res);
+        console.log(res.data);
+        store.commit("setUserInfo", res.data);
         dialogMessage.value = "Update user information successful";
         if (dialog.value) {
           dialog.value.show();
@@ -60,32 +65,54 @@ const onSave = () => {
   }
 };
 
+const getCategories = async () => {
+  try {
+    const res = await axios.get(`/category`);
+    categories.value = res.data;
+    console.log(categories.value);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+async function getUserInfo() {
+  try {
+    const response = await axios.get(`/user/${userId.value}`);
+    const user = response.data;
+    console.log(user);
+    username.value = user.username;
+    email.value = user.email;
+    name.value = user.name;
+    password.value = user.password;
+    avatar.value = user.avatar;
+    thumbnail.value = user.thumbnail;
+    about.value = user.about;
+    if (user.categories != null) {
+      selectedCategories.value = categories.value.filter((x) =>
+        user.categories.includes(x.value)
+      );
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 onMounted(() => {
   store.state.isAbsolute = true;
   setNavPills();
   setTooltip();
 });
-onBeforeMount(() => {
+
+onBeforeMount(async () => {
+  await getCategories();
+
   store.state.imageLayout = "profile-overview";
   store.state.showNavbar = false;
   store.state.showFooter = true;
   store.state.hideConfigButton = true;
-  body.classList.add("profile-overview");
+  document.body.classList.add("profile-overview");
 
-  try {
-    axios.get(`/user/${userId.value}`).then((res) => {
-      console.log(res.data);
-      username.value = res.data.username;
-      email.value = res.data.email;
-      name.value = res.data.name;
-      password.value = res.data.password;
-      avatar.value = res.data.avatar;
-      thumbnail.value = res.data.thumbnail;
-      about.value = res.data.about;
-    });
-  } catch (error) {
-    console.log(error);
-  }
+  await getUserInfo();
 });
 onBeforeUnmount(() => {
   store.state.isAbsolute = false;
@@ -112,8 +139,8 @@ onBeforeUnmount(() => {
       <div class="card shadow-lg mt-n12">
         <div class="card-body p-3">
           <div class="row gx-4">
-            <div class="col-auto d-flex"> 
-              <div class="  avatar avatar-xl position-relative">
+            <div class="col-auto d-flex">
+              <div class="avatar avatar-xl position-relative">
                 <img
                   :src="avatar"
                   alt="profile_image"
@@ -123,8 +150,8 @@ onBeforeUnmount(() => {
             </div>
             <div class="col-auto my-auto">
               <div class="h-100">
-                <h5 class="mb-1">Sayo Kravits</h5>
-                <p class="mb-0 font-weight-bold text-sm">Public Relations</p>
+                <h5 class="mb-1">{{ name }}</h5>
+                <p class="mb-0 font-weight-bold text-sm">{{ username }}</p>
               </div>
             </div>
             <div
@@ -355,7 +382,7 @@ onBeforeUnmount(() => {
                   <argon-input
                     :type="'password'"
                     v-model="password"
-                    :disabled="!isEdit"
+                    :disabled="true"
                   />
                 </div>
                 <div class="col-md-12">
@@ -391,6 +418,28 @@ onBeforeUnmount(() => {
                     v-model="about"
                     :disabled="!isEdit"
                   />
+                </div>
+                <div class="col-md-12">
+                  <div class="row">
+                    <label for="example-text-input" class="form-control-label"
+                      >Favourite categories</label
+                    >
+                    <div class="multi-select-box">
+                      <Multiselect
+                        :disabled="!isEdit"
+                        v-model="selectedCategories"
+                        :options="categories"
+                        :multiple="true"
+                        :close-on-select="false"
+                        :clear-on-select="false"
+                        :preserve-search="true"
+                        placeholder="Pick some category"
+                        label="name"
+                        track-by="name"
+                      >
+                      </Multiselect>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

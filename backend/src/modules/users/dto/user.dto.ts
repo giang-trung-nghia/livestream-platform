@@ -21,6 +21,9 @@ export class UserDto extends BaseDto {
   thumbnail: string;
 
   @Expose()
+  categories: Array<number>;
+
+  @Expose()
   dob: string;
 
   @Expose()
