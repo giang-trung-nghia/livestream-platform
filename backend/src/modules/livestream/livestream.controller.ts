@@ -52,7 +52,6 @@ export class LivestreamController extends BaseController<
     @Param('id') id: string,
   ): Promise<LivestreamEntity> {
     const result = await this._livestreamService.findLastestLiveByUserId(id);
-
     return result;
   }
 

@@ -116,6 +116,9 @@ export default createStore({
         commit("setUserInfo", response.data);
         console.log(response.data);
       } catch (error) {
+        if(error.response.data.statusCode == 401) {
+          commit("clearAuth")
+        }
         console.error("Error fetching user info:", error);
       }
     },

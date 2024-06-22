@@ -1,5 +1,6 @@
 <script setup>
 import VideoComponent from "@/components/Video.vue";
+import ArgonAvatar from "@/components/ArgonAvatar.vue";
 import axios from "@/services/axios.js";
 import { computed, ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -11,6 +12,8 @@ const store = useStore();
 const username = computed(() => route.params.username);
 const liveId = ref("");
 const userId = computed(() => store.state.userId);
+const liveTitle = ref("");
+const avatarUrl = ref("");
 const userFullname = ref("");
 const srcVideo = ref("");
 
@@ -19,6 +22,7 @@ async function getLiveByUserName() {
     const response = await axios.get(`/live/username/${username.value}`);
     liveId.value = response.data._id;
     store.commit("setLivestreamingId", response.data._id);
+    liveTitle.value = response.data.title;
     srcVideo.value = `${process.env.VUE_APP_IP + process.env.VUE_APP_PORT_HLS}/${response.data.rtmpKey}/index.m3u8`;
   } catch (error) {
     console.error("Failed to fetch live data:", error);
@@ -33,9 +37,10 @@ onMounted(() => {
 });
 
 watch(
-  () => store.state.userInfo.name,
+  () => store.state.userInfo,
   (newValue) => {
-    userFullname.value = newValue;
+    userFullname.value = newValue.name;
+    avatarUrl.value = newValue.avatar;
   }
 );
 </script>
@@ -43,10 +48,24 @@ watch(
   <div class="py-4 container-fluid">
     <div class="row">
       <div class="col-lg-12">
-        <div class="row livestream-content">
+        <div v-if="srcVideo" class="row livestream-content">
           <div class="col-lg-8 h-100">
-            <div v-if="srcVideo" class="card z-index-2 h-100">
+            <div class="card z-index-2">
               <VideoComponent :src="srcVideo"></VideoComponent>
+            </div>
+            <div class="row">
+              <div class="col-lg-3 d-flex justify-content-between">
+                <ArgonAvatar
+                  class="mt-2"
+                  :circular="true"
+                  :image="avatarUrl"
+                  alt="avt"
+                />
+                <div class="mt-2 d-flex flex-column">
+                  <div>{{ liveTitle }}</div>
+                  <div>{{ userFullname }}</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="col-lg-4 h-100">
@@ -55,6 +74,11 @@ watch(
               :userId="userId"
               :userFullname="userFullname"
             />
+          </div>
+        </div>
+        <div v-else class="row">
+          <div class="col-lg-10">
+            <p class="badge bg-secondary p-4">Not found livestream</p>
           </div>
         </div>
       </div>

@@ -6,7 +6,6 @@ import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
 import DialogComponent from "@/components/DialogComponent.vue";
 import MiniStatisticsCard from "@/examples/Cards/MiniStatisticsCard.vue";
-import Multiselect from "vue-multiselect";
 
 export default {
   components: {
@@ -14,7 +13,6 @@ export default {
     ArgonButton,
     ArgonInput,
     DialogComponent,
-    Multiselect,
   },
   data() {
     return {
@@ -25,17 +23,11 @@ export default {
       streamingURL: "",
       dialogTitle: "",
       dialogMessage: "",
-      categories: [],
-      selectedCategories: [],
       userId: "",
       isEdit: false,
     };
   },
   setup() {},
-  async beforeMount() {
-    await this.fetchCategories();
-  },
-
   async mounted() {
     const store = useStore();
     // const isLivestreaming = computed(() => store.state.isLivestreaming);
@@ -46,14 +38,6 @@ export default {
     this.streamingURL = process.env.VUE_APP_IP + process.env.VUE_APP_PORT_LIVE;
   },
   methods: {
-    async fetchCategories() {
-      try {
-        const res = await axios.get('/category');
-        this.categories = res.data;
-      } catch (error) {
-        console.error(error);
-      }
-    },
 
     async fetchStreamingInfoByUserId(id) {
       try {
@@ -65,13 +49,13 @@ export default {
           const data = res.data;
           this.title = data.title;
           this.thumbnailUrl = data.thumbnail;
-          this.selectedCategories = this.categories.filter((x) =>
-            data.categories.includes(x.value)
-          );
           this.streamingKey = res.data.streamingKey;
           this.$store.dispatch("setLivestreamingId", res.data._id);
         }
       } catch (error) {
+        if(error.response.data.message == "Not found live stream!") {
+          this.isCreateLive = true
+        }
         console.error(error);
       }
     },
@@ -81,7 +65,6 @@ export default {
         const res = await axios.post(`/live`, {
           title: this.title,
           userId: this.userId,
-          categories: this.selectedCategories.map((e) => e.value),
         });
 
         this.streamingKey = res.data.streamingKey;
@@ -185,30 +168,6 @@ export default {
                           type="text"
                           v-model="title"
                         />
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="row">
-                        <label
-                          for="example-text-input"
-                          class="form-control-label"
-                          >Category</label
-                        >
-                        <div class="multi-select-box">
-                          <Multiselect
-                            :disabled="!isCreateLive && !isEdit"
-                            v-model="selectedCategories"
-                            :options="categories"
-                            :multiple="true"
-                            :close-on-select="false"
-                            :clear-on-select="false"
-                            :preserve-search="true"
-                            placeholder="Pick some category"
-                            label="name"
-                            track-by="name"
-                          >
-                          </Multiselect>
-                        </div>
                       </div>
                     </div>
                   </div>

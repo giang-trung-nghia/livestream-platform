@@ -1,8 +1,10 @@
 <script setup>
-defineProps({
+import { computed } from 'vue';
+
+const props = defineProps({
   image: {
     type: String,
-    required: true,
+    default: "",
   },
   alt: {
     type: String,
@@ -25,6 +27,13 @@ defineProps({
     default: false,
   },
 });
+
+const defaultImage = "https://images.squarespace-cdn.com/content/v1/54b7b93ce4b0a3e130d5d232/1519987020970-8IQ7F6Z61LLBCX85A65S/icon.png?format=500w";
+
+const imageUrl = computed(() => {
+  return props.image ? props.image : defaultImage;
+});
+
 const getSize = (size) => (size ? `avatar-${size}` : null);
 const getClasses = (shadow, circular, borderRadius) => {
   let shadowValue, circularValue, borderRadiusValue;
@@ -45,7 +54,7 @@ const getClasses = (shadow, circular, borderRadius) => {
 <template>
   <div class="avatar" :class="getSize(size)">
     <img
-      :src="image"
+      :src="imageUrl"
       :alt="alt"
       :class="[getClasses(shadow, circular, borderRadius)]"
     />

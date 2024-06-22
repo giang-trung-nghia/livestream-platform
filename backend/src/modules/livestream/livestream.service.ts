@@ -45,6 +45,10 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
         this.generateStreamingKey(latestLivestream);
       return latestLivestream;
     }
+
+    if (latestLivestream == null) {
+      throw new NotFoundException('Not found live stream!');
+    }
     return null;
   }
 
@@ -52,6 +56,7 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     const latestLivestream = await this._repo.findOne({
       where: {
         username: username,
+        endTime: null,
       },
       order: {
         createdAt: 'DESC',
@@ -64,10 +69,12 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
       if (!this.isStreamKeyExpired(latestLivestream.streamKeyExpiresAt)) {
         latestLivestream.streamingKey =
           this.generateStreamingKey(latestLivestream);
+
         return latestLivestream;
       }
+      this.endLivestream(latestLivestream._id);
+      throw new BadRequestException('Livestream is end');
     }
-    return null;
   }
 
   async findPagingFilter(
@@ -154,7 +161,7 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
     return live;
   }
 
-  async endLivestream(id: string): Promise<LivestreamEntity> {
+  async endLivestream(id: string | ObjectId): Promise<LivestreamEntity> {
     const oId = new ObjectId(id);
     const live = await this._repo.findOne({
       where: {

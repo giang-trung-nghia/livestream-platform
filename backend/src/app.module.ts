@@ -11,6 +11,7 @@ import { CommentModule } from './modules/comments/comment.module';
 import { GiftModule } from './modules/gifts/gift.module';
 import { CategoryModule } from './modules/categories/category.module';
 import { CommentsGateway } from './modules/comments/comments.gateway';
+import { MusicModule } from './modules/music/music.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { CommentsGateway } from './modules/comments/comments.gateway';
     CommentModule,
     GiftModule,
     CategoryModule,
+    MusicModule,
   ],
   controllers: [AppController],
   providers: [AppService, CommentsGateway],

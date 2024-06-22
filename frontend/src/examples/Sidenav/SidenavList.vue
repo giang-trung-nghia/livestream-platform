@@ -128,6 +128,18 @@ onUpdated(() => {
         </sidenav-item>
       </li>
 
+      <li class="nav-item" v-if="isLogin">
+        <sidenav-item
+          :to="`/music`"
+          :class="getRoute() === `music` ? 'active' : ''"
+          navText="Music store"
+        >
+          <template v-slot:icon>
+            <i class="ni ni-sound-wave text-primary text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+
       <li class="nav-item" v-if="!isLogin">
         <sidenav-item
           to="/signin"

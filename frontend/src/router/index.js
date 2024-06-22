@@ -1,15 +1,16 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
-import LivestreamSetting from "../views/LivestreamSetting.vue"
+import LivestreamSetting from "../views/LivestreamSetting.vue";
 import Tables from "../views/Tables.vue";
 import Billing from "../views/Billing.vue";
 import VirtualReality from "../views/VirtualReality.vue";
 import LivestreamRoom from "../views/LivestreamRoom.vue";
-import LivestreamMenu from "../views/LivestreamMenu.vue"
+import LivestreamMenu from "../views/LivestreamMenu.vue";
+import MusicStore from "../views/MusicStore.vue";
 import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
-import store from '@/store';
+import store from "@/store";
 
 const routes = [
   {
@@ -26,7 +27,7 @@ const routes = [
     path: "/me/live",
     name: "Livestream",
     component: LivestreamSetting,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
   },
   {
     path: "/live/:username",
@@ -57,7 +58,12 @@ const routes = [
     path: "/profile",
     name: "Profile",
     component: Profile,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/music",
+    name: "Music",
+    component: MusicStore,
   },
   {
     path: "/signin",
@@ -79,9 +85,9 @@ const router = createRouter({
 
 // Navigation guard để kiểm tra đăng nhập
 router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     if (!store.getters.isLogin) {
-      next({ name: 'Signin' }); // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
+      next({ name: "Signin" }); // Chuyển hướng đến trang đăng nhập nếu chưa đăng nhập
     } else {
       next(); // Tiếp tục nếu đã đăng nhập
     }
