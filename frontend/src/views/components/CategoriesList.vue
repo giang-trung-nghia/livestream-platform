@@ -47,7 +47,6 @@ defineProps({
             </div>
             <div class="d-flex flex-column">
               <h6 class="mb-1 text-sm text-dark">{{ label }}</h6>
-              <!-- eslint-disable-next-line vue/no-v-html -->
               <span class="text-xs" v-html="description"> </span>
             </div>
           </div>

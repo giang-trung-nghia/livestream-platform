@@ -2,8 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import Dashboard from "../views/Dashboard.vue";
 import LivestreamSetting from "../views/LivestreamSetting.vue";
 import Tables from "../views/Tables.vue";
-import Billing from "../views/Billing.vue";
-import VirtualReality from "../views/VirtualReality.vue";
 import LivestreamRoom from "../views/LivestreamRoom.vue";
 import LivestreamMenu from "../views/LivestreamMenu.vue";
 import MusicStore from "../views/MusicStore.vue";
@@ -44,16 +42,6 @@ const routes = [
     path: "/tables",
     name: "Tables",
     component: Tables,
-  },
-  {
-    path: "/billing",
-    name: "Billing",
-    component: Billing,
-  },
-  {
-    path: "/virtual-reality",
-    name: "Virtual Reality",
-    component: VirtualReality,
   },
   {
     path: "/profile",
