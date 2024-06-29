@@ -4,6 +4,7 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 import ArgonInput from "@/components/ArgonInput.vue";
 import ArgonButton from "@/components/ArgonButton.vue";
+import ArgonAlert from "@/components/ArgonAlert.vue";
 import DialogComponent from "@/components/DialogComponent.vue";
 import MiniStatisticsCard from "@/examples/Cards/MiniStatisticsCard.vue";
 
@@ -12,6 +13,7 @@ export default {
     MiniStatisticsCard,
     ArgonButton,
     ArgonInput,
+    ArgonAlert,
     DialogComponent,
   },
   data() {
@@ -24,6 +26,7 @@ export default {
       dialogTitle: "",
       dialogMessage: "",
       userId: "",
+      showAlert: false,
       isEdit: false,
     };
   },
@@ -38,6 +41,13 @@ export default {
     this.streamingURL = process.env.VUE_APP_IP + process.env.VUE_APP_PORT_LIVE;
   },
   methods: {
+    copyToClipboard(item) {
+      navigator.clipboard.writeText(item);
+      this.showAlert = true;
+      setTimeout(() => {
+        this.showAlert = false;
+      }, 3000);
+    },
 
     async fetchStreamingInfoByUserId(id) {
       try {
@@ -53,8 +63,8 @@ export default {
           this.$store.dispatch("setLivestreamingId", res.data._id);
         }
       } catch (error) {
-        if(error.response.data.message == "Not found live stream!") {
-          this.isCreateLive = true
+        if (error.response.data.message == "Not found live stream!") {
+          this.isCreateLive = true;
         }
         console.error(error);
       }
@@ -177,7 +187,11 @@ export default {
           </div>
         </div>
       </div>
-      <div v-if="streamingKey" class="col-lg-10 col-md-10 mt-4 col-12">
+      <div
+        v-if="streamingKey"
+        @click="copyToClipboard(streamingKey)"
+        class="clickable col-lg-10 col-md-10 mt-4 col-12"
+      >
         <MiniStatisticsCard
           title="Streaming url"
           :value="streamingURL"
@@ -190,6 +204,11 @@ export default {
         />
       </div>
     </div>
+  </div>
+  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050">
+    <argon-alert v-if="showAlert" color="success">
+      {{ "Link copied to clipboard!" }}
+    </argon-alert>
   </div>
   <DialogComponent ref="dialog" :title="dialogTitle" :message="dialogMessage" />
 </template>
@@ -206,5 +225,9 @@ export default {
 .multiselect__tags {
   height: 50px; /* Chiều cao mong muốn */
   min-height: unset;
+}
+
+.clickable {
+  cursor: pointer;
 }
 </style>

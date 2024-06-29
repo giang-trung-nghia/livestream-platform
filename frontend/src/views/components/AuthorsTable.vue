@@ -1,105 +1,116 @@
 <template>
-  <div class="card">
-    <div class="card-header pb-0 d-flex justify-content-between">
-      <h6>Music store</h6>
-      <button
-        type="button"
-        class="btn btn-primary"
-        @click="isShowAddSong = !isShowAddSong"
-        v-if="isAdmin"
-      >
-        Add song
-      </button>
-    </div>
-    <div class="card-body px-0 pt-0 pb-2 vh-70 scrollable">
-      <div class="table-responsive p-0">
-        <table class="table align-items-center mb-0">
-          <thead>
-            <tr>
-              <th
-                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
-              >
-                Name
-              </th>
-              <th
-                class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 w-20"
-              >
-                Author
-              </th>
-              <th
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
-              >
-                Copy Link
-              </th>
-              <th
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
-              >
-                Listen
-              </th>
-              <th
-                v-if="isAdmin"
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
-              >
-                Delete
-              </th>
-            </tr>
-          </thead>
-          <tbody class="">
-            <tr v-if="isShowAddSong">
-              <th class="text-xxs font-weight-bolder w-20">
-                <argon-input type="text" v-model="song.name" />
-              </th>
-              <th class="text-xxs font-weight-bolder ps-2 w-20">
-                <argon-input type="text" v-model="song.author" />
-              </th>
-              <th class="text-xxs font-weight-bolder w-20">
-                <argon-input type="text" v-model="song.link" />
-              </th>
-              <th class="text-center text-xxs font-weight-bolder w-20">
-                <button type="button" class="btn btn-primary" @click="addSong">
-                  Add
-                </button>
-              </th>
-              <th
-                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
-              ></th>
-            </tr>
-            <tr v-for="(item, index) in musicData" :key="index">
-              <td>
-                <div class="d-flex px-2 py-1">
-                  <div class="d-flex flex-column justify-content-center">
-                    <h6 class="mb-0 text-sm">{{ item.name }}</h6>
-                  </div>
-                </div>
-              </td>
-              <td>
-                <p class="text-xs font-weight-bold mb-0">{{ item.author }}</p>
-                <p class="text-xs text-secondary mb-0">
-                  {{ item.organization }}
-                </p>
-              </td>
-              <td
-                class="clickable align-middle text-center text-sm"
-                @click="copyToClipboard(item)"
-              >
-                <span class="badge badge-sm bg-gradient-success">Link</span>
-              </td>
-              <td class="align-middle text-center">
-                <span class="text-secondary text-xs font-weight-bold">
-                  {{ item.listenCount }}
-                </span>
-              </td>
-              <td
-                v-if="isAdmin"
-                class="align-middle text-center"
-                @click="onDeleteSong(item._id)"
-              >
-                <button type="button" class="btn-close"></button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+  <div class="">
+    <div class="card">
+      <div class="card-header pb-0 d-flex justify-content-between">
+        <h6>Music store</h6>
+        <button
+          type="button"
+          class="btn btn-primary"
+          @click="isShowAddSong = !isShowAddSong"
+          v-if="isAdmin"
+        >
+          Add song
+        </button>
       </div>
+      <div class="card-body px-0 pt-0 pb-2 vh-70 scrollable">
+        <div class="table-responsive p-0">
+          <table class="table align-items-center mb-0">
+            <thead>
+              <tr>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
+                >
+                  Name
+                </th>
+                <th
+                  class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2 w-20"
+                >
+                  Author
+                </th>
+                <th
+                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
+                >
+                  Copy Link
+                </th>
+                <th
+                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
+                >
+                  Listen
+                </th>
+                <th
+                  v-if="isAdmin"
+                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
+                >
+                  Delete
+                </th>
+              </tr>
+            </thead>
+            <tbody class="">
+              <tr v-if="isShowAddSong">
+                <th class="text-xxs font-weight-bolder w-20">
+                  <argon-input type="text" v-model="song.name" />
+                </th>
+                <th class="text-xxs font-weight-bolder ps-2 w-20">
+                  <argon-input type="text" v-model="song.author" />
+                </th>
+                <th class="text-xxs font-weight-bolder w-20">
+                  <argon-input type="text" v-model="song.link" />
+                </th>
+                <th class="text-center text-xxs font-weight-bolder w-20">
+                  <button
+                    type="button"
+                    class="btn btn-primary"
+                    @click="addSong"
+                  >
+                    Add
+                  </button>
+                </th>
+                <th
+                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
+                ></th>
+              </tr>
+              <tr v-for="(item, index) in musicData" :key="index">
+                <td>
+                  <div class="d-flex px-2 py-1">
+                    <div class="d-flex flex-column justify-content-center">
+                      <h6 class="mb-0 text-sm">{{ item.name }}</h6>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <p class="text-xs font-weight-bold mb-0">{{ item.author }}</p>
+                  <p class="text-xs text-secondary mb-0">
+                    {{ item.organization }}
+                  </p>
+                </td>
+                <td
+                  class="clickable align-middle text-center text-sm"
+                  @click="copyToClipboard(item)"
+                >
+                  <span class="badge badge-sm bg-gradient-success">Link</span>
+                </td>
+                <td class="align-middle text-center">
+                  <span class="text-secondary text-xs font-weight-bold">
+                    {{ item.listenCount }}
+                  </span>
+                </td>
+                <td
+                  v-if="isAdmin"
+                  class="align-middle text-center"
+                  @click="onDeleteSong(item._id)"
+                >
+                  <button type="button" class="btn-close"></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+      <argon-alert v-if="showAlert" :color="alertColor" >
+        {{ alertMessage }}
+      </argon-alert>
     </div>
   </div>
 </template>
@@ -109,6 +120,7 @@ import { ref, defineProps, computed } from "vue";
 import { useStore } from "vuex";
 import axios from "@/services/axios.js";
 import ArgonInput from "@/components/ArgonInput.vue";
+import ArgonAlert from "@/components/ArgonAlert.vue";
 defineProps({
   musicData: {
     type: Array,
@@ -126,6 +138,10 @@ const song = ref({
   link: "",
   listenCount: 0,
 });
+
+const showAlert = ref(false);
+const alertColor = ref("success");
+const alertMessage = ref("");
 
 const addSong = async () => {
   try {
@@ -151,7 +167,12 @@ const copyToClipboard = async (song) => {
       name: song.name,
       author: song.author,
     });
-    alert("Link copied to clipboard!");
+    alertMessage.value = "Link copied to clipboard!";
+    alertColor.value = "success";
+    showAlert.value = true;
+    setTimeout(() => {
+      showAlert.value = false;
+    }, 3000);
   } catch (err) {
     console.error("Failed to copy: ", err);
   }
