@@ -6,6 +6,7 @@
         type="button"
         class="btn btn-primary"
         @click="isShowAddSong = !isShowAddSong"
+        v-if="isAdmin"
       >
         Add song
       </button>
@@ -36,6 +37,7 @@
                 Listen
               </th>
               <th
+                v-if="isAdmin"
                 class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 w-20"
               >
                 Delete
@@ -88,6 +90,7 @@
                 </span>
               </td>
               <td
+                v-if="isAdmin"
                 class="align-middle text-center"
                 @click="onDeleteSong(item._id)"
               >
@@ -102,7 +105,8 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from "vue";
+import { ref, defineProps, computed } from "vue";
+import { useStore } from "vuex";
 import axios from "@/services/axios.js";
 import ArgonInput from "@/components/ArgonInput.vue";
 defineProps({
@@ -113,7 +117,8 @@ defineProps({
   },
 });
 const emit = defineEmits(["onReload"]);
-
+const store = useStore();
+const isAdmin = computed(() => store.state.userInfo.role).value == "admin";
 const isShowAddSong = ref(false);
 const song = ref({
   name: "",
