@@ -133,7 +133,7 @@ onUpdated(() => {
         <sidenav-item
           to="/me/live"
           :class="getRoute() === 'livestream' ? 'active' : ''"
-          navText="Livestream Setting"
+          navText="Livestream setting"
         >
           <template v-slot:icon>
             <i class="ni ni-settings text-primary text-sm opacity-10"></i>

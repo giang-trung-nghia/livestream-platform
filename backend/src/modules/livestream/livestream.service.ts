@@ -237,4 +237,20 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
       return false;
     }
   }
+
+  async refreshExpires() {
+    const lives = await this._repo.find({
+      where: {
+        endTime: null,
+      },
+    });
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+
+    lives.forEach((e) => {
+      e.streamKeyExpiresAt = date;
+    });
+
+    await this._repo.save(lives);
+  }
 }

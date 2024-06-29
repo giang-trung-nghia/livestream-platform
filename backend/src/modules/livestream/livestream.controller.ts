@@ -80,4 +80,10 @@ export class LivestreamController extends BaseController<
     );
     return result;
   }
+
+  @Public()
+  @Get('/refreshExpires')
+  async refreshExpires() {
+    await this._livestreamService.refreshExpires();
+  }
 }
