@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  rtmp:
+    build: ./rtmp
+    ports:
+      - "1935:1935"
+      - "8888:8888"
+    container_name: livestream-platform
+    volumes:
+      - ./data:/tmp/hls
