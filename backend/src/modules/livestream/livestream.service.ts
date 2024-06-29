@@ -72,7 +72,7 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
 
         return latestLivestream;
       }
-      this.endLivestream(latestLivestream._id);
+      // this.endLivestream(latestLivestream._id);
       throw new BadRequestException('Livestream is end');
     }
   }
@@ -120,11 +120,18 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
   }
 
   async create(data: CreateLivestreamDto): Promise<LivestreamEntity> {
+    const user = await this._userService.findOneById(data.userId);
+    if (!user.isActive) {
+      throw new ForbiddenException(
+        'Banned users please contact the administrator for assistance',
+      );
+    }
+    const formatdata = { ...data, categories: user.categories };
+
+    const entity = await this._repo.save(formatdata);
+
     data.createdAt = new Date();
     data.updatedAt = new Date();
-
-    const entity = await this._repo.save(data);
-    const user = await this._userService.findOneById(data.userId);
     const result = this.generateRtmpKey(entity);
     result.username = user.username;
     result.streamingKey = this.generateStreamingKey(result);

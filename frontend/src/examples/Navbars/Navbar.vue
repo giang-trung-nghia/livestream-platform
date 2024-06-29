@@ -10,7 +10,7 @@ const showMenu = ref(false);
 const showUserMenu = ref(false);
 const store = useStore();
 const isRTL = computed(() => store.state.isRTL);
-const isLogin = computed(() => store.state.username !== "");
+const isLogin = computed(() => store.state.userInfo !== "");
 const avtImageSrc = ref(""); // Sử dụng ref để lưu trữ giá trị ban đầu
 const route = useRoute();
 const router = useRouter();

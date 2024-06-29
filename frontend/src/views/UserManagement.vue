@@ -1,29 +1,28 @@
 <script>
 import axios from "@/services/axios.js";
-import AuthorsTable from "./components/AuthorsTable.vue";
+import UserTable from "./components/UserTable.vue";
 
 export default {
   components: {
-    AuthorsTable,
+    UserTable,
   },
   data() {
     return {
       srcVideo: String,
-      listSong: [],
+      listUser: [],
       isEdit: false,
     };
   },
   setup() {},
   async mounted() {
-    await this.fetchMusicStore();
+    await this.fetchUser();
   },
   methods: {
-    async fetchMusicStore() {
+    async fetchUser() {
       try {
-        console.log("called");
-        const res = await axios.get(`/music`);
+        const res = await axios.get(`/user`);
         console.log(res);
-        this.listSong = res.data;
+        this.listUser = res.data;
       } catch (error) {
         console.error(error);
       }
@@ -35,7 +34,8 @@ export default {
   <div class="py-4 container-fluid">
     <div class="row">
       <div class="col-md-12">
-        <AuthorsTable :musicData="listSong" @onReload="fetchMusicStore"/>
+        <UserTable :listUser="listUser" 
+        @reload="fetchUser"/>
       </div>
     </div>
   </div>

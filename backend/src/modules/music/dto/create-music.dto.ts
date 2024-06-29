@@ -12,5 +12,5 @@ export class CreateMusicDto extends BaseDto {
   author: string;
 
   @Expose()
-  listenCount: string;
+  listenCount: number;
 }

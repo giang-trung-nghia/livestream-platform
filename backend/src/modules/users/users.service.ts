@@ -18,9 +18,7 @@ export class UserService {
   async getAll(): Promise<UserDto[]> {
     const result = await this._userRepository.find();
 
-    return plainToInstance(UserDto, result, {
-      excludeExtraneousValues: true,
-    });
+    return result;
   }
 
   async getByName(username: string): Promise<UserDto> {
@@ -68,6 +66,9 @@ export class UserService {
       userDto.createdAt = new Date();
       userDto.updatedAt = new Date();
       const result: UserEntity = await this._userRepository.save(userDto);
+      result.isActive = true;
+      result.role = 'user';
+      await this._userRepository.save(result);
       return plainToInstance(UserDto, result, {
         excludeExtraneousValues: true,
       });
@@ -76,19 +77,17 @@ export class UserService {
     }
   }
 
-  async update(id: ObjectId, userUpdateDto: UpdateUserDto): Promise<UserDto> {
-    userUpdateDto.updatedAt = new Date();
+  async update(_id: ObjectId, userUpdateDto: UpdateUserDto): Promise<UserDto> {
+    userUpdateDto = { ...userUpdateDto, updatedAt: new Date() };
 
-    await this._userRepository.update(id, userUpdateDto);
-
+    await this._userRepository.update(_id, userUpdateDto);
     const result = await this._userRepository.findOne({
       where: {
-        _id: id,
+        _id: _id,
       },
     });
-    return plainToInstance(UserDto, result, {
-      excludeExtraneousValues: true,
-    });
+
+    return result;
   }
 
   async delete(id: string): Promise<{ success: string }> {

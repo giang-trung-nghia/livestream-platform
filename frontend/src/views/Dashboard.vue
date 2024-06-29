@@ -22,15 +22,15 @@ export default {
       this.listlive = response.data.data;
       const newLive = this.listlive[this.curVideoIndex];
       this.srcVideo = `${process.env.VUE_APP_IP + process.env.VUE_APP_PORT_HLS}/${newLive.rtmpKey}/index.m3u8`;
-      console.log(this.srcVideo);
+      // console.log(this.srcVideo);
     }
   },
   methods: {
     onVideoError() {
       if (this.curVideoIndex < this.listlive.length-1) {
         this.srcVideo = `${process.env.VUE_APP_IP + process.env.VUE_APP_PORT_HLS}/${this.listlive[++this.curVideoIndex].rtmpKey}/index.m3u8`;
-        console.log(this.curVideoIndex);
-        console.log(this.srcVideo);
+        // console.log(this.curVideoIndex);
+        // console.log(this.srcVideo);
       }
     },
   },

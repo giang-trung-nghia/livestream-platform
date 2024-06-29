@@ -34,7 +34,6 @@
 
 <script setup>
 import axios from "@/services/axios.js";
-// eslint-disable-next-line no-unused-vars
 import { computed, ref, onMounted, nextTick, onUnmounted, watch } from "vue";
 import { defineProps } from "vue";
 import { useStore } from "vuex";
@@ -83,6 +82,7 @@ async function postComment() {
         content: newComment.value.trim(),
       });
       // Send the new comment to WebSocket server
+      console.log(response);
       socket.emit("newComment", { ...response.data, socketId: socket.id });
       newComment.value = "";
       scrollToBottom();
@@ -121,12 +121,18 @@ function setupWebSocket() {
 watch(
   () => props.liveId,
   (newLiveId) => {
+    console.log("new live id" + newLiveId);
     if (newLiveId) {
       fetchComments();
       setupWebSocket();
     }
   }
 );
+
+onMounted(() => {
+  fetchComments();
+  setupWebSocket();
+})
 
 onUnmounted(() => {
   if (socket) {

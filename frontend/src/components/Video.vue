@@ -48,8 +48,9 @@ export default {
         const currentTime = this.player.currentTime();
         this.player.src({ src: newSrc, type: "application/x-mpegURL" });
         this.player.currentTime(currentTime);
+        // eslint-disable-next-line no-unused-vars
         this.player.play().catch((error) => {
-          console.log("play() error:", error);
+          // console.log("play() error:", error);
         });
       }
     },

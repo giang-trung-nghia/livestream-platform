@@ -1,6 +1,5 @@
 import {
   DeepPartial,
-  DeleteResult,
   FindOptionsWhere,
   Repository,
   UpdateResult,
@@ -14,11 +13,18 @@ export class BaseService<T extends BaseEntity> {
   constructor(protected repository: Repository<T>) {}
 
   async findAll(): Promise<T[]> {
-    return await this.repository.find();
+    return await this.repository.find({
+      where: {
+        deleteAt: null,
+      },
+    });
   }
 
   async findPaging(page: number, size: number): Promise<PagingResponse<T>> {
     const [data, total] = await this.repository.findAndCount({
+      where: {
+        deleteAt: null,
+      },
       skip: (page - 1) * size,
       take: size,
     });
@@ -44,10 +50,9 @@ export class BaseService<T extends BaseEntity> {
     return await this.repository.update(objectId, partialEntity);
   }
 
-  async delete(id: string): Promise<DeleteResult> {
+  async delete(id: string): Promise<any> {
     const objectId = new ObjectId(id);
-    return await this.repository.update(objectId, {
-      deletedAt: new Date(),
-    } as unknown as QueryDeepPartialEntity<T>);
+    await this.repository.delete(objectId);
+    return 1;
   }
 }

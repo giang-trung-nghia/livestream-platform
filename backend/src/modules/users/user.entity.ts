@@ -50,4 +50,7 @@ export class UserEntity extends BaseEntity {
 
   @Column()
   address: string;
+
+  @Column()
+  isActive: boolean;
 }

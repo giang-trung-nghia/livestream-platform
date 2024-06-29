@@ -28,4 +28,7 @@ export class UserDto extends BaseDto {
 
   @Expose()
   role: string;
+
+  @Expose()
+  isActive: boolean;
 }

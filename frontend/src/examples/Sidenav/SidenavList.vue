@@ -6,10 +6,11 @@ import { useStore } from "vuex";
 import SidenavItem from "./SidenavItem.vue";
 
 const store = useStore();
-const isLogin = computed(() => store.state.username !== "");
+const isLogin = computed(() => store.state.userInfo !== "");
 const listCategory = computed(() => store.state.listCategory);
 const isOpenCategory = ref("");
 const username = ref("");
+const isAdmin = computed(() => store.state.userInfo.role == "admin");
 const route = useRoute();
 const getRoute = () => {
   const route = useRoute();
@@ -32,7 +33,19 @@ watch(
   () => route.query.category,
   (newValue) => {
     selectedCategory.value = newValue;
+    console.log(newValue);
   },
+  () => store.state.userInfo,
+  (newValue) => {
+    console.log(newValue.role);
+    if (newValue == "admin") {
+      console.log("true");
+      isAdmin.value = true;
+    }
+    else {
+      isAdmin.value = false
+    }
+  }
 );
 
 onUpdated(() => {
@@ -53,6 +66,18 @@ onUpdated(() => {
         >
           <template v-slot:icon>
             <i class="ni ni-tv-2 text-primary text-sm opacity-10"></i>
+          </template>
+        </sidenav-item>
+      </li>
+
+      <li class="nav-item" v-if="isAdmin">
+        <sidenav-item
+          to="/user"
+          :class="getRoute() === 'user' ? 'active' : ''"
+          :navText="'User management'"
+        >
+          <template v-slot:icon>
+            <i class="ni ni-single-02 text-dark text-sm opacity-10"></i>
           </template>
         </sidenav-item>
       </li>

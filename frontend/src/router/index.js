@@ -10,6 +10,7 @@ import MusicStore from "../views/MusicStore.vue";
 import Profile from "../views/Profile.vue";
 import Signup from "../views/Signup.vue";
 import Signin from "../views/Signin.vue";
+import UserManagement from "../views/UserManagement.vue";
 import store from "@/store";
 
 const routes = [
@@ -74,6 +75,12 @@ const routes = [
     path: "/signup",
     name: "Signup",
     component: Signup,
+  },
+  {
+    path: "/user",
+    name: "User",
+    component: UserManagement,
+    meta: { requiresAuth: true },
   },
 ];
 

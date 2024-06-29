@@ -139,11 +139,6 @@ const darkMode = () => {
             />
           </div>
         </div>
-        <a
-          class="btn btn-outline-dark w-100"
-          href="https://www.creative-tim.com/learning-lab/vue/overview/argon-dashboard/"
-          >View documentation</a
-        >
       </div>
     </div>
   </div>

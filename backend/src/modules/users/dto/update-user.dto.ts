@@ -1,7 +1,6 @@
 import { Expose } from 'class-transformer';
-import { BaseDto } from 'src/common/base/base.dto';
 
-export class UpdateUserDto extends BaseDto {
+export class UpdateUserDto {
   @Expose()
   name: string;
 
@@ -22,4 +21,16 @@ export class UpdateUserDto extends BaseDto {
 
   @Expose()
   money: number;
+
+  @Expose()
+  isActive: boolean;
+
+  @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
+  deleteAt: Date;
 }

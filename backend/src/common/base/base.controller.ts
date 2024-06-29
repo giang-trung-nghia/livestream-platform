@@ -45,7 +45,8 @@ export class BaseController<T extends BaseEntity, CreateDto, UpdateDto> {
   }
 
   @Delete(':id')
-  async delete(@Param('id') id: string): Promise<void> {
+  async delete(@Param('id') id: string): Promise<any> {
     await this.baseService.delete(id);
+    return 1;
   }
 }

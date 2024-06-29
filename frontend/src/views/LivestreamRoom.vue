@@ -1,6 +1,5 @@
 <script setup>
 import VideoComponent from "@/components/Video.vue";
-import ArgonAvatar from "@/components/ArgonAvatar.vue";
 import axios from "@/services/axios.js";
 import { computed, ref, onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
@@ -39,6 +38,7 @@ onMounted(() => {
 watch(
   () => store.state.userInfo,
   (newValue) => {
+    console.log("watch", newValue);
     userFullname.value = newValue.name;
     avatarUrl.value = newValue.avatar;
   }
@@ -52,20 +52,6 @@ watch(
           <div class="col-lg-8 h-100">
             <div class="card z-index-2">
               <VideoComponent :src="srcVideo"></VideoComponent>
-            </div>
-            <div class="row">
-              <div class="col-lg-3 d-flex justify-content-between">
-                <ArgonAvatar
-                  class="mt-2"
-                  :circular="true"
-                  :image="avatarUrl"
-                  alt="avt"
-                />
-                <div class="mt-2 d-flex flex-column">
-                  <div>{{ liveTitle }}</div>
-                  <div>{{ userFullname }}</div>
-                </div>
-              </div>
             </div>
           </div>
           <div class="col-lg-4 h-100">

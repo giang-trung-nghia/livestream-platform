@@ -61,7 +61,7 @@ export default createStore({
       state.token = token;
     },
     clearAuth(state) {
-      state.username = "";
+      state.userInfo = "";
       state.userId = "";
       state.token = "";
     },
@@ -114,7 +114,6 @@ export default createStore({
       try {
         const response = await axios.get(`user/${userId}`);
         commit("setUserInfo", response.data);
-        console.log(response.data);
       } catch (error) {
         if(error.response.data.statusCode == 401) {
           commit("clearAuth")
