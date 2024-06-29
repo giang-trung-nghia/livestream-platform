@@ -41,12 +41,16 @@ export default {
     this.streamingURL = process.env.VUE_APP_IP + process.env.VUE_APP_PORT_LIVE;
   },
   methods: {
-    copyToClipboard(item) {
-      navigator.clipboard.writeText(item);
-      this.showAlert = true;
-      setTimeout(() => {
-        this.showAlert = false;
-      }, 3000);
+    async copyToClipboard(item) {
+      try {
+        await navigator.clipboard.writeText(item);
+        this.showAlert = true;
+        setTimeout(() => {
+          this.showAlert = false;
+        }, 3000);
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     async fetchStreamingInfoByUserId(id) {
