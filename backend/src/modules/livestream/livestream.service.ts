@@ -159,6 +159,12 @@ export class LivestreamService extends BaseService<LivestreamEntity> {
       throw new NotFoundException('not found live with liveId');
     }
 
+    if (live.endTime) {
+      console.log('Livestream ended');
+
+      throw new BadRequestException('livestream ended');
+    }
+
     if (!this.authenticateStreamKey(liveId, key)) {
       throw new ForbiddenException('Stream key is not valid');
     }

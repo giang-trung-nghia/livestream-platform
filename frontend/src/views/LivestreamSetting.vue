@@ -98,6 +98,8 @@ export default {
         const liveId = this.$store.getters.livestreamingId;
         const res = await axios.put(`/live/end/${liveId}`, {});
         console.log(res);
+        this.streamingKey = null;
+        this.title = "";
         this.isCreateLive = true;
       } catch (error) {
         this.dialogTitle = "Error";
