@@ -17,7 +17,6 @@ npm run serve
 SECRET_KEY=NGHIA_KEY
 DATABASE_USER=root
 DATEBASE_PASSWORD=root
-MONGO_URI=mongodb+srv://nghia2905per:nghiA2905@livestream-platform.2ii1nwi.mongodb.net/?retryWrites=true&w=majority&appName=livestream-platform
 MONGO_URI=<mongo_connection_string>
 ### Run
 cd ./backend
